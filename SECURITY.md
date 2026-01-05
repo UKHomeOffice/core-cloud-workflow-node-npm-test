@@ -15,7 +15,7 @@ The directories:
 
 contain node code that:
 
-* violate will fail on running tests
+* will fail on running tests
 
 These files are required to:
 

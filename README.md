@@ -1,6 +1,6 @@
 # core-cloud-workflow-node-npm-test
 
-A GitHub Actions workflow for running npm test on Node.js projects to identify and report code quality issues.
+A GitHub Actions workflow for running npm test on Node.js projects to identify and report code tests passing and failing.
 
 ## Overview
 
