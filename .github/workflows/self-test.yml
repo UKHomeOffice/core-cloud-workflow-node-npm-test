@@ -1,0 +1,46 @@
+name: Self Test - npm test action
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+    branches:
+      - main
+
+permissions:
+  contents: read
+
+jobs:
+  test-valid:
+    name: Test - Valid Node npm test
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v6
+
+      - name: Run npm test (valid config)
+        uses: ./
+        with:
+          working_directory: "tests/test-test-valid"
+          post_install_script: "npx playwright install --with-deps"
+
+  test-invalid:
+    name: Test - Invalid Node npm test
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v6
+
+      - name: Run npm test (invalid config)
+        id: test
+        uses: ./
+        continue-on-error: true
+        with:
+          working_directory: "tests/test-test-invalid"
+          post_install_script: "npx playwright install --with-deps"
+
+
+      - name: Assert failure
+        run: |
+          if [ "${{ steps.test.outputs.npm_test_exit_code }}" -eq 0 ]; then
+            echo "Expected npm test to fail but it succeeded."
+            exit 1
+          fi

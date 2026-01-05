@@ -1,0 +1,60 @@
+name: Node npm test
+
+inputs:
+  working_directory:
+    description: "Directory to run npm test in (default: repository root)"
+    required: false
+    type: string
+    default: "."
+
+  node_version:
+    description: "Node version to install (e.g., 24)"
+    required: false
+    type: string
+    default: "24"
+
+  post_install_script:
+    description: "Optional script to run after npm install"
+    required: false
+    type: string
+    default: ""
+
+outputs:
+  npm_test_exit_code:
+    description: "The exit code from the npm test command"
+    value: ${{ steps.npm_test.outputs.exit_code }}
+
+runs:
+  using: "composite"
+
+  steps:
+    - name: Checkout Repository
+      uses: actions/checkout@v6
+
+    - name: Setup Node
+      uses: actions/setup-node@v6
+      with:
+        node-version: ${{ inputs.node_version }}
+
+    - name: Install Node Dependencies
+      shell: bash
+      working-directory: ${{ inputs.working_directory }}
+      run: npm ci
+
+    - name: Run Post-Install Script
+      if: ${{ inputs.post_install_script != '' }}
+      shell: bash
+      working-directory: ${{ inputs.working_directory }}
+      run: |
+        echo "Running post-install script..."
+        eval "${{ inputs.post_install_script }}"
+
+    - name: Run npm test
+      id: npm_test
+      shell: bash
+      working-directory: ${{ inputs.working_directory }}
+      run: |
+        npm run test
+
+        EXIT_CODE=$?
+        echo "exit_code=$EXIT_CODE" >> $GITHUB_OUTPUT
